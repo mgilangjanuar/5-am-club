@@ -33,7 +33,7 @@ export async function getGuildSettings(guildId: string): Promise<GuildSettings |
     return null;
   }
 
-  const settings = result[0] as GuildSettings;
+  const settings = result[0] as unknown as GuildSettings;
   setCache(cacheKey, settings, CACHE_TTL.GUILD_SETTINGS);
   return settings;
 }
@@ -124,5 +124,5 @@ export async function getAllConfiguredGuilds(): Promise<GuildSettings[]> {
     WHERE fiveam_channel_id IS NOT NULL
   `;
 
-  return result as GuildSettings[];
+  return result as unknown as GuildSettings[];
 }

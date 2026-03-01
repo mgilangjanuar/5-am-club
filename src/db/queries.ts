@@ -85,7 +85,7 @@ export async function getTodayPresence(guildId: string): Promise<TodayPresenceEn
     ORDER BY present_at ASC
   `;
 
-  return result as TodayPresenceEntry[];
+  return result as unknown as TodayPresenceEntry[];
 }
 
 // ============================================
@@ -108,7 +108,7 @@ export async function getAllTimeLeaderboard(guildId: string): Promise<Leaderboar
     LIMIT 10
   `;
 
-  return result as LeaderboardEntry[];
+  return result as unknown as LeaderboardEntry[];
 }
 
 /**
@@ -157,7 +157,7 @@ export async function getUserStats(userId: string, guildId: string): Promise<Use
     return null;
   }
 
-  return result[0] as UserStats;
+  return result[0] as unknown as UserStats;
 }
 
 /**
@@ -261,7 +261,7 @@ async function getGuildHolidayDates(guildId: string): Promise<Set<string>> {
 
   const holidayDates = new Set<string>();
 
-  for (const h of holidays as HolidayRecord[]) {
+  for (const h of holidays as unknown as HolidayRecord[]) {
     const startStr = dateToString(h.start_date);
     const endStr = dateToString(h.end_date);
     const start = new Date(startStr + 'T12:00:00');
@@ -285,7 +285,7 @@ async function getGuildUsers(guildId: string): Promise<UserRecord[]> {
     FROM presence_records 
     WHERE guild_id = ${guildId}
   `;
-  return result as UserRecord[];
+  return result as unknown as UserRecord[];
 }
 
 async function getUserPresenceRecords(userId: string, guildId: string): Promise<PresenceRecord[]> {
@@ -296,7 +296,7 @@ async function getUserPresenceRecords(userId: string, guildId: string): Promise<
       AND guild_id = ${guildId}
     ORDER BY present_date DESC
   `;
-  return result as PresenceRecord[];
+  return result as unknown as PresenceRecord[];
 }
 
 async function calculateStreaksForUsers(
@@ -322,7 +322,7 @@ async function calculateStreaksForUsers(
 
   // Group records by user_id in memory
   const recordsByUser = new Map<string, Set<string>>();
-  for (const record of allRecords as { user_id: string; present_date: Date | string }[]) {
+  for (const record of allRecords as unknown as { user_id: string; present_date: Date | string }[]) {
     const userId = record.user_id;
     if (!recordsByUser.has(userId)) {
       recordsByUser.set(userId, new Set());

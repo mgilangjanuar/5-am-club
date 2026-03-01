@@ -45,7 +45,7 @@ export async function addHoliday(
   `;
 
   invalidateCachePattern(CACHE_KEYS.holidays(guildId));
-  return result[0] as Holiday;
+  return result[0] as unknown as Holiday;
 }
 
 /**
@@ -75,7 +75,7 @@ export async function getHolidays(guildId: string): Promise<Holiday[]> {
     ORDER BY start_date ASC
   `;
   
-  return result as Holiday[];
+  return result as unknown as Holiday[];
 }
 
 /**
@@ -94,7 +94,7 @@ export async function getUpcomingHolidays(guildId: string, limit: number = 5): P
     LIMIT ${limit}
   `;
   
-  return result as Holiday[];
+  return result as unknown as Holiday[];
 }
 
 /**
