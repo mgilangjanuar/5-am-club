@@ -61,9 +61,9 @@ export async function hasRecordedToday(userId: string, guildId: string): Promise
   const today = getDateStringInTimezone(timezone);
 
   const result = await sql`
-    SELECT id FROM presence_records 
-    WHERE user_id = ${userId} 
-      AND guild_id = ${guildId} 
+    SELECT id FROM presence_records
+    WHERE user_id = ${userId}
+      AND guild_id = ${guildId}
       AND present_date = ${today}
   `;
 
@@ -79,13 +79,18 @@ export async function getTodayPresence(guildId: string): Promise<TodayPresenceEn
 
   const result = await sql`
     SELECT user_id, username, present_at
-    FROM presence_records 
-    WHERE guild_id = ${guildId} 
+    FROM presence_records
+    WHERE guild_id = ${guildId}
       AND present_date = ${today}
     ORDER BY present_at ASC
-  `;
+  ` as unknown as TodayPresenceEntry[];
 
-  return result as unknown as TodayPresenceEntry[];
+  // Convert present_at to UTC+7 date object
+  return result.map(entry => ({
+    user_id: entry.user_id,
+    username: entry.username,
+    present_at: new Date(entry.present_at) // Assuming present_at is stored in UTC, it will be converted to local time when displayed
+  }));
 }
 
 // ============================================
@@ -97,11 +102,11 @@ export async function getTodayPresence(guildId: string): Promise<TodayPresenceEn
  */
 export async function getAllTimeLeaderboard(guildId: string): Promise<LeaderboardEntry[]> {
   const result = await sql`
-    SELECT 
+    SELECT
       user_id,
       username,
       COUNT(*) as total_presents
-    FROM presence_records 
+    FROM presence_records
     WHERE guild_id = ${guildId}
     GROUP BY user_id, username
     ORDER BY total_presents DESC, MIN(present_at) ASC
@@ -143,12 +148,12 @@ export async function getStreakLeaderboard(guildId: string): Promise<StreakEntry
  */
 export async function getUserStats(userId: string, guildId: string): Promise<UserStats | null> {
   const result = await sql`
-    SELECT 
+    SELECT
       COUNT(*) as total_presents,
       MAX(present_date) as last_present,
       MIN(present_date) as first_present
-    FROM presence_records 
-    WHERE user_id = ${userId} 
+    FROM presence_records
+    WHERE user_id = ${userId}
       AND guild_id = ${guildId}
   `;
 
@@ -282,7 +287,7 @@ async function getGuildHolidayDates(guildId: string): Promise<Set<string>> {
 async function getGuildUsers(guildId: string): Promise<UserRecord[]> {
   const result = await sql`
     SELECT DISTINCT user_id, username
-    FROM presence_records 
+    FROM presence_records
     WHERE guild_id = ${guildId}
   `;
   return result as unknown as UserRecord[];
@@ -291,8 +296,8 @@ async function getGuildUsers(guildId: string): Promise<UserRecord[]> {
 async function getUserPresenceRecords(userId: string, guildId: string): Promise<PresenceRecord[]> {
   const result = await sql`
     SELECT present_date
-    FROM presence_records 
-    WHERE user_id = ${userId} 
+    FROM presence_records
+    WHERE user_id = ${userId}
       AND guild_id = ${guildId}
     ORDER BY present_date DESC
   `;
