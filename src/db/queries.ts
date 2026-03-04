@@ -85,12 +85,7 @@ export async function getTodayPresence(guildId: string): Promise<TodayPresenceEn
     ORDER BY present_at ASC
   ` as unknown as TodayPresenceEntry[];
 
-  // Convert present_at to UTC+7 date object
-  return result.map(entry => ({
-    user_id: entry.user_id,
-    username: entry.username,
-    present_at: new Date(entry.present_at) // Assuming present_at is stored in UTC, it will be converted to local time when displayed
-  }));
+  return result
 }
 
 // ============================================

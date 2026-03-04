@@ -14,7 +14,7 @@ export function buildDailySummaryEmbed(
   const today = formatTodayDate(timezone);
   const title = getEmbedTitle(isTestMode);
   const footer = getEmbedFooter(isTestMode);
-  
+
   const embed = new EmbedBuilder()
     .setTitle(title)
     .setColor(0xF1C40F)
@@ -22,7 +22,7 @@ export function buildDailySummaryEmbed(
     .setFooter({ text: footer });
 
   setDescription(embed, today, isTestMode);
-  addTodayAttendeesField(embed, todayPresence);
+  addTodayAttendeesField(embed, todayPresence, timezone);
   addStreakLeaderboardField(embed, streakLeaderboard);
   addMotivationalQuoteField(embed);
 
@@ -65,7 +65,7 @@ function formatTodayDate(timezone: string): string {
   });
 }
 
-function addTodayAttendeesField(embed: EmbedBuilder, todayPresence: TodayPresenceEntry[]): void {
+function addTodayAttendeesField(embed: EmbedBuilder, todayPresence: TodayPresenceEntry[], timezone: string): void {
   if (todayPresence.length === 0) {
     embed.addFields({
       name: '📋 Today\'s Early Risers',
@@ -75,7 +75,7 @@ function addTodayAttendeesField(embed: EmbedBuilder, todayPresence: TodayPresenc
     return;
   }
 
-  const attendeeList = formatAttendeeList(todayPresence);
+  const attendeeList = formatAttendeeList(todayPresence, timezone);
   embed.addFields({
     name: `📋 Today's Early Risers (${todayPresence.length})`,
     value: attendeeList,
@@ -83,10 +83,10 @@ function addTodayAttendeesField(embed: EmbedBuilder, todayPresence: TodayPresenc
   });
 }
 
-function formatAttendeeList(todayPresence: TodayPresenceEntry[]): string {
+function formatAttendeeList(todayPresence: TodayPresenceEntry[], timezone: string): string {
   return todayPresence
     .map((entry, index) => {
-      const time = formatTime(entry.present_at);
+      const time = formatTime(entry.present_at, timezone);
       return `${index + 1}. <@${entry.user_id}> at ${time}`;
     })
     .join('\n');
@@ -129,8 +129,9 @@ function addMotivationalQuoteField(embed: EmbedBuilder): void {
   });
 }
 
-function formatTime(date: Date): string {
+function formatTime(date: Date, timezone: string): string {
   return new Date(date).toLocaleTimeString('en-US', {
+    timeZone: timezone,
     hour: '2-digit',
     minute: '2-digit'
   });
