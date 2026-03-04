@@ -10,9 +10,8 @@ export interface ApiHolidayData {
 }
 
 interface ApiResponse {
-  holiday_date: string;
-  holiday_name: string;
-  is_national_holiday: boolean;
+  date: string;   // e.g. "2026-01-01"
+  description: string;
 }
 
 /**
@@ -20,21 +19,21 @@ interface ApiResponse {
  * Uses api-harilibur.vercel.app
  */
 export async function fetchIndonesianHolidays(year: number): Promise<ApiHolidayData[]> {
-  const url = `https://api-harilibur.vercel.app/api?year=${year}`;
-  
+  const url = `https://api-hari-libur.vercel.app/api?year=${year}`;
+
   try {
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       throw new Error(`API returned status ${response.status}`);
     }
-    
-    const data = await response.json() as ApiResponse[];
-    
+
+    const { data } = await response.json() as { data: ApiResponse[] };
+
     return data.map(item => ({
-      holiday_date: item.holiday_date,
-      holiday_name: item.holiday_name,
-      is_national_holiday: item.is_national_holiday,
+      holiday_date: item.date,
+      holiday_name: item.description,
+      is_national_holiday: item.description.toLowerCase().includes('cuti bersama') ? false : true,
     }));
   } catch (error) {
     console.error('❌ Failed to fetch holidays from API:', error);
