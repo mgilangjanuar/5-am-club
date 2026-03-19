@@ -11,7 +11,7 @@ export interface ApiHolidayData {
 
 interface ApiResponse {
   date: string;   // e.g. "2026-01-01"
-  description: string;
+  name: string;
 }
 
 /**
@@ -28,12 +28,12 @@ export async function fetchIndonesianHolidays(year: number): Promise<ApiHolidayD
       throw new Error(`API returned status ${response.status}`);
     }
 
-    const { data } = await response.json() as { data: ApiResponse[] };
+    const data = await response.json() as ApiResponse[];
 
     return data.map(item => ({
       holiday_date: item.date,
-      holiday_name: item.description,
-      is_national_holiday: item.description.toLowerCase().includes('cuti bersama') ? false : true,
+      holiday_name: item.name,
+      is_national_holiday: item.name.toLowerCase().includes('cuti bersama') ? false : true,
     }));
   } catch (error) {
     console.error('❌ Failed to fetch holidays from API:', error);
