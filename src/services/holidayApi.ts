@@ -19,7 +19,7 @@ interface ApiResponse {
  * Uses api-harilibur.vercel.app
  */
 export async function fetchIndonesianHolidays(year: number): Promise<ApiHolidayData[]> {
-  const url = `https://api-hari-libur.vercel.app/api?year=${year}`;
+  const url = `https://libur.deno.dev/api?year=${year}`;
 
   try {
     const response = await fetch(url);
